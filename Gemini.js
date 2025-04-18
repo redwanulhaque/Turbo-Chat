@@ -5,7 +5,7 @@ import {
 } from "@google/generative-ai";
 
 const MODEL_NAME = "gemini-2.0-flash";
-const API_KEY = "AIzaSyBq_f3ueWdCZYdij5bPAFZi4e4z-xS45ns"; // Ensure this key is valid
+const API_KEY = ""; // Ensure this key is valid
 
 async function runChat(prompt) {
   console.log("🔵 Sending prompt:", prompt); // Debugging: Check if function is called
