@@ -4,55 +4,55 @@ import runChat from "../config/Gemini";
 export const Context = createContext();
 
 const formatResponse = (text) => {
-    let formatted = text
-        .replace(/\*\*(.*?)\*\*/g, "<b>$1</b>")     // **bold**
-        .replace(/\*(.*?)\*/g, "<i>$1</i>")         // *italic*
-        .replace(/\n\n/g, "<br/><br/>")             // paragraph breaks
-        .replace(/\n/g, "<br/>");                   // single line breaks
+	let formatted = text
+		.replace(/\*\*(.*?)\*\*/g, "<b>$1</b>")     // **bold**
+		.replace(/\*(.*?)\*/g, "<i>$1</i>")         // *italic*
+		.replace(/\n\n/g, "<br/><br/>")             // paragraph breaks
+		.replace(/\n/g, "<br/>");                   // single line breaks
 
-    const lines = formatted.split("<br/>");
-    const stack = [];
-    let html = "";
+	const lines = formatted.split("<br/>");
+	const stack = [];
+	let html = "";
 
-    lines.forEach((line) => {
-        const match = line.match(/^(\s*)- (.*)/);
-        if (match) {
-            const indent = match[1].length;
-            const content = match[2];
+	lines.forEach((line) => {
+		const match = line.match(/^(\s*)[-*] (.*)/); // supports both - and *
+		if (match) {
+			const indent = match[1].length;
+			const content = match[2];
 
-            // Close deeper or same-level lists
-            while (stack.length && stack[stack.length - 1] >= indent) {
-                html += "</li></ul>";
-                stack.pop();
-            }
+			// Close deeper or same-level lists
+			while (stack.length && stack[stack.length - 1] >= indent) {
+				html += "</li></ul>";
+				stack.pop();
+			}
 
-            // Open new nested list
-            if (!stack.length || stack[stack.length - 1] < indent) {
-                html += `<ul style="margin-left: ${1.5 * (stack.length + 1)}em;"><li>`;
-                stack.push(indent);
-            } else {
-                html += "</li><li>";
-            }
+			// Open new nested list
+			if (!stack.length || stack[stack.length - 1] < indent) {
+				html += `<ul style="margin-left: ${1.5 * (stack.length + 1)}em;"><li>`;
+				stack.push(indent);
+			} else {
+				html += "</li><li>";
+			}
 
-            html += content;
-        } else {
-            // Close all open lists before continuing
-            while (stack.length) {
-                html += "</li></ul>";
-                stack.pop();
-            }
+			html += content;
+		} else {
+			// Close all open lists before continuing
+			while (stack.length) {
+				html += "</li></ul>";
+				stack.pop();
+			}
 
-            html += line + "<br/>";
-        }
-    });
+			html += line + "<br/>";
+		}
+	});
 
-    // Close any remaining open lists
-    while (stack.length) {
-        html += "</li></ul>";
-        stack.pop();
-    }
+	// Close any remaining open lists
+	while (stack.length) {
+		html += "</li></ul>";
+		stack.pop();
+	}
 
-    return html;
+	return html;
 };
 
 const ContextProvider = (props) => {
