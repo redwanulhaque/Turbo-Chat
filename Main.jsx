@@ -83,53 +83,80 @@ const Main = () => {
 		setInput("");
 	};
 
-	// Function to search for resume experience
-	const getResumeResponse = (message) => {
-		const lowerMessage = message.toLowerCase();
-
-		for (const job of resumeData.experience) {
-			if (lowerMessage.includes(job.company.toLowerCase()) || lowerMessage.includes(job.title.toLowerCase())) {
-				return `You worked at ${job.company} as a ${job.title} (${job.duration}). Here are some things you did:\n- ${job.responsibilities.join("\n- ")}`;
-			}
-		}
-		return null;
-	};
-
 	// Function to search for education details
 	const getEducationResponse = (message) => {
 		const lowerMessage = message.toLowerCase();
 		const { school, degree, duration, gpa } = resumeData.education;
-
+	
 		if (lowerMessage.includes("education") || lowerMessage.includes("school") || lowerMessage.includes("college")) {
-			return `You are currently earning a ${degree} at ${school}. Duration: ${duration}. Current GPA: ${gpa}.`;
+			return `Redwanul is currently earning a ${degree} at ${school}. Duration: ${duration}. Current GPA: ${gpa}.`;
 		}
 		return null;
 	};
 
-	// Function to search for project details
+	// Function to search for resume experience
+	const getResumeResponse = (message) => {
+		const lowerMessage = message.toLowerCase();
+	
+		if (
+			lowerMessage.includes("experience") ||
+			lowerMessage.includes("experiences") ||
+			lowerMessage.includes("work history") ||
+			lowerMessage.includes("jobs") ||
+			lowerMessage.includes("job")
+
+		) {
+			return resumeData.experience.map(job => 
+				`Redwanul worked at ${job.company} as a ${job.title} (${job.duration}).\nResponsibilities:\n- ${job.responsibilities.join("\n- ")}`
+			).join("\n\n");
+		}
+	
+		for (const job of resumeData.experience) {
+			if (
+				lowerMessage.includes(job.company.toLowerCase()) ||
+				lowerMessage.includes(job.title.toLowerCase())
+			) {
+				return `Redwanul worked at ${job.company} as a ${job.title} (${job.duration}). Here are some things you did:\n- ${job.responsibilities.join("\n- ")}`;
+			}
+		}
+	
+		return null;
+	};
+	
+
 	const getProjectResponse = (message) => {
 		const lowerMessage = message.toLowerCase();
-
-		// General project query
-		if (lowerMessage.includes("projects") || lowerMessage.includes("my projects")) {
-			return `Here are your projects:\n- ${resumeData.projects.map(p => p.name).join("\n- ")}`;
+	
+		// General project query – return all projects with details
+		if (
+			lowerMessage.includes("projects") ||
+			lowerMessage.includes("project")
+		) {
+			return `Here are your projects:\n\n${resumeData.projects
+				.map(
+					(project) =>
+						`**${project.name}**\n  Description: ${project.description}`
+				)
+				.join("\n\n")}`;
 		}
-
-		// Check for a specific project name
+	
+		// Check for a specific project name or keyword
 		for (const project of resumeData.projects) {
-			if (project.keywords.some(keyword => lowerMessage.includes(keyword))) {
+			if (project.keywords.some((keyword) => lowerMessage.includes(keyword))) {
 				return `Project: ${project.name}\nDescription: ${project.description}`;
 			}
 		}
+	
 		return null;
 	};
+	
 
 	// Function to search for skills
 	const getSkillResponse = (message) => {
 		const lowerMessage = message.toLowerCase();
 
 		// General skills query
-		if (lowerMessage.includes("skills") || lowerMessage.includes("what am i good at")) {
+		if (lowerMessage.includes("skills") || lowerMessage.includes("what am i good at") || lowerMessage.includes("skill")) {
 			return `Your skills:\n${Object.entries(resumeData.skills.categories)
 				.map(([category, skills]) => `- ${category}: ${skills.join(", ")}`)
 				.join("\n")}`;
