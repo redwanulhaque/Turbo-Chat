@@ -3,7 +3,7 @@ import { assets } from "../../assets/assets";
 import "./main.css";
 import { Context } from "../../context/Context";
 import robot from "../../assets/robot.gif";
-import resumeData from "../resumeData"; // Import resume data
+import resumeData from "../resumeData";
 
 const Main = () => {
 	const {
@@ -19,14 +19,13 @@ const Main = () => {
 
 	const [isRecording, setIsRecording] = useState(false);
 	const [recognition, setRecognition] = useState(null);
-	const [chatHistory, setChatHistory] = useState([]); // Store chat history
-
-	// Ref to scroll the chat container
+	const [chatHistory, setChatHistory] = useState([]);
+	const [isUserScrolling, setIsUserScrolling] = useState(false);
 	const chatContainerRef = useRef(null);
 
 	useEffect(() => {
-		// Initialize Speech Recognition
-		const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+		const SpeechRecognition =
+			window.SpeechRecognition || window.webkitSpeechRecognition;
 		if (SpeechRecognition) {
 			const recog = new SpeechRecognition();
 			recog.lang = "en-US";
@@ -34,7 +33,7 @@ const Main = () => {
 			recog.onresult = (event) => {
 				const transcript = event.results[0][0].transcript;
 				setInput(transcript);
-				handleSend(transcript); // Send transcript to chat
+				handleSend(transcript);
 			};
 			recog.onerror = (event) => {
 				console.error("Speech recognition error:", event.error);
@@ -45,12 +44,20 @@ const Main = () => {
 		}
 	}, []);
 
+	// Smart scroll behavior
 	useEffect(() => {
-		// Scroll to the bottom of the chat container when new chat history is added
-		if (chatContainerRef.current) {
-			chatContainerRef.current.scrollTop = chatContainerRef.current.scrollHeight;
+		if (!isUserScrolling && chatContainerRef.current) {
+			chatContainerRef.current.scrollTop =
+				chatContainerRef.current.scrollHeight;
 		}
-	}, [chatHistory]); // Trigger on chatHistory change
+	}, [chatHistory, resultData, loading]);
+
+	const handleScroll = () => {
+		if (!chatContainerRef.current) return;
+		const { scrollTop, scrollHeight, clientHeight } = chatContainerRef.current;
+		const isAtBottom = scrollTop + clientHeight >= scrollHeight - 20;
+		setIsUserScrolling(!isAtBottom);
+	};
 
 	const handleMicClick = () => {
 		if (isRecording) {
@@ -63,75 +70,75 @@ const Main = () => {
 
 	const handleSend = (message) => {
 		if (!message.trim()) return;
-	
-		// Check if message is related to resume (education, experience, projects, or skills)
+
 		const response =
 			getResumeResponse(message) ||
 			getEducationResponse(message) ||
 			getProjectResponse(message) ||
 			getSkillResponse(message);
-	
+
 		if (response) {
 			setChatHistory((prev) => [...prev, { prompt: message, response }]);
 		} else {
-			// If no resume match, send to AI
 			setChatHistory((prev) => [...prev, { prompt: message, response: null }]);
-			onSent(message); // Fetch AI response
+			onSent(message);
 		}
-	
-		// Clear the input field after sending the message
 		setInput("");
+		setIsUserScrolling(false);
 	};
 
-	// Function to search for education details
 	const getEducationResponse = (message) => {
 		const lowerMessage = message.toLowerCase();
 		const { school, degree, duration, gpa } = resumeData.education;
-	
-		if (lowerMessage.includes("education") || lowerMessage.includes("school") || lowerMessage.includes("college")) {
+
+		if (
+			lowerMessage.includes("education") ||
+			lowerMessage.includes("school") ||
+			lowerMessage.includes("college")
+		) {
 			return `Redwanul is currently earning a ${degree} at ${school}. Duration: ${duration}. Current GPA: ${gpa}.`;
 		}
 		return null;
 	};
 
-	// Function to search for resume experience
 	const getResumeResponse = (message) => {
 		const lowerMessage = message.toLowerCase();
-	
+
 		if (
 			lowerMessage.includes("experience") ||
 			lowerMessage.includes("experiences") ||
 			lowerMessage.includes("work history") ||
 			lowerMessage.includes("jobs") ||
 			lowerMessage.includes("job")
-
 		) {
-			return resumeData.experience.map(job => 
-				`Redwanul worked at ${job.company} as a ${job.title} (${job.duration}).\nResponsibilities:\n- ${job.responsibilities.join("\n- ")}`
-			).join("\n\n");
+			return resumeData.experience
+				.map(
+					(job) =>
+						`Redwanul worked at ${job.company} as a ${job.title} (${job.duration}).\nResponsibilities:\n- ${job.responsibilities.join(
+							"\n- "
+						)}`
+				)
+				.join("\n\n");
 		}
-	
+
 		for (const job of resumeData.experience) {
 			if (
 				lowerMessage.includes(job.company.toLowerCase()) ||
 				lowerMessage.includes(job.title.toLowerCase())
 			) {
-				return `Redwanul worked at ${job.company} as a ${job.title} (${job.duration}). Here are some things you did:\n- ${job.responsibilities.join("\n- ")}`;
+				return `Redwanul worked at ${job.company} as a ${job.title} (${job.duration}). Here are some things you did:\n- ${job.responsibilities.join(
+					"\n- "
+				)}`;
 			}
 		}
-	
+
 		return null;
 	};
-	
 
 	const getProjectResponse = (message) => {
 		const lowerMessage = message.toLowerCase();
-	
-		// General project query – return all projects with details
-		if (
-			lowerMessage.includes("projects") ||
-			lowerMessage.includes("project")
-		) {
+
+		if (lowerMessage.includes("projects") || lowerMessage.includes("project")) {
 			return `Here are your projects:\n\n${resumeData.projects
 				.map(
 					(project) =>
@@ -139,30 +146,29 @@ const Main = () => {
 				)
 				.join("\n\n")}`;
 		}
-	
-		// Check for a specific project name or keyword
+
 		for (const project of resumeData.projects) {
 			if (project.keywords.some((keyword) => lowerMessage.includes(keyword))) {
 				return `Project: ${project.name}\nDescription: ${project.description}`;
 			}
 		}
-	
+
 		return null;
 	};
-	
 
-	// Function to search for skills
 	const getSkillResponse = (message) => {
 		const lowerMessage = message.toLowerCase();
 
-		// General skills query
-		if (lowerMessage.includes("skills") || lowerMessage.includes("what am i good at") || lowerMessage.includes("skill")) {
+		if (
+			lowerMessage.includes("skills") ||
+			lowerMessage.includes("what am i good at") ||
+			lowerMessage.includes("skill")
+		) {
 			return `Your skills:\n${Object.entries(resumeData.skills.categories)
 				.map(([category, skills]) => `- ${category}: ${skills.join(", ")}`)
 				.join("\n")}`;
 		}
 
-		// Check for category-specific skills
 		for (const [category, skills] of Object.entries(resumeData.skills.categories)) {
 			if (lowerMessage.includes(category.toLowerCase())) {
 				return `${category}: ${skills.join(", ")}`;
@@ -173,7 +179,6 @@ const Main = () => {
 	};
 
 	useEffect(() => {
-		// Update chat history with AI response when resultData changes
 		if (recentPrompt && resultData) {
 			setChatHistory((prev) =>
 				prev.map((item, index) =>
@@ -186,7 +191,6 @@ const Main = () => {
 	return (
 		<div className="main">
 			<div className="main-container">
-				{/* Greeting Section */}
 				{chatHistory.length === 0 && !loading && (
 					<>
 						<div className="greet">
@@ -194,36 +198,36 @@ const Main = () => {
 								<span className="typing">Hello, my name is Turbo</span>
 							</p>
 						</div>
-
 						<div className="wrapper four">
 							<div className="type">
 								<h3 className="typing">How can I assist you today?</h3>
 							</div>
 						</div>
-
 						<div className="robot">
 							<img src={robot} alt="Greeting Robot" />
 						</div>
 					</>
 				)}
 
-				{/* Chat History Section */}
-				<div className="result" ref={chatContainerRef}>
+				{/* Chat Section */}
+				<div
+					className="result"
+					ref={chatContainerRef}
+					onScroll={handleScroll}
+					style={{ overflowY: "auto", maxHeight: "70vh" }}
+				>
 					{chatHistory.map((item, index) => (
 						<div key={index} className="chat-item">
-							{/* User's message */}
 							<div className="result-title">
 								<img src={assets.user} alt="User Icon" />
 								<p>{item.prompt}</p>
 							</div>
-							{/* AI's response */}
 							<div className="result-data">
 								<img
 									src={assets.gemini_icon}
 									alt="AI Icon"
 									style={{ position: "relative", top: "-10px" }}
 								/>
-
 								{item.response ? (
 									<div
 										className="ai-response"
@@ -238,7 +242,6 @@ const Main = () => {
 										</div>
 									)
 								)}
-
 							</div>
 						</div>
 					))}
@@ -252,9 +255,7 @@ const Main = () => {
 							value={input}
 							type="text"
 							placeholder="Message Turbo"
-							onKeyPress={(e) =>
-								e.key === "Enter" && handleSend(input)
-							}
+							onKeyPress={(e) => e.key === "Enter" && handleSend(input)}
 						/>
 						<div>
 							<img
