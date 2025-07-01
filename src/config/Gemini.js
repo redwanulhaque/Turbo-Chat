@@ -7,7 +7,7 @@ import {
 
 // Define model name and API key
 const MODEL_NAME = "gemini-2.0-flash";
-const API_KEY = "AIzaSyBq_f3ueWdCZYdij5bPAFZi4e4z-xS45ns"; // Replace with your valid API key
+const API_KEY = ""; // Replace with your valid API key
 
 // Main function to send prompt and receive AI-generated response
 async function runChat(prompt) {
