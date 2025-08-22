@@ -1,0 +1,247 @@
+/* Styles the main layout area */
+.main {
+    flex: 1;
+    min-height: 100vh;
+    min-width: 62vh;
+    padding-bottom: 15vh;
+    position: relative;
+    background: linear-gradient(135deg, #ffffff, #cacaca);
+}
+
+/* Centers and limits the width of the content */
+.main-container {
+    max-width: 900px;
+    margin: auto;
+}
+
+/* Styling for the greeting message */
+.main-container .greet {
+    margin: 120px 0px;
+    text-align: center;
+    font-size: 56px;
+    color: #302a29;
+    font-weight: 500;
+    position: relative;
+    border-radius: 10px;
+}
+
+/* Adds gradient text effect for greeting */
+.main .greet span {
+    background: -webkit-linear-gradient(16deg, #aa492f, #0babef);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+}
+
+/* Container for typing animation text */
+.wrapper.four {
+    position: relative;
+    margin-top: -160px;
+    font-size: 1.6rem;
+    font-family: "Play", sans-serif;
+}
+
+/* Inner wrapper for typing section */
+.four .type {
+    padding: 2rem 1rem;
+    width: auto;
+    margin: auto;
+}
+
+/* Styles typing animation text */
+.four h3 {
+    font-weight: 500;
+    width: 23ch;
+    border-right: 4px solid black;
+    margin: 2rem auto;
+    white-space: nowrap;
+    overflow: hidden;
+    animation: typing-backspace 18s steps(19, end) infinite, blink-caret 0.5s step-end infinite alternate;
+}
+
+/* Caret blinking effect */
+@-webkit-keyframes blink-caret {
+    50% {
+        border-color: transparent;
+    }
+}
+
+/* Animation for typing and deleting text */
+@keyframes typing-backspace {
+    0%, 15%, 100% {
+        width: 0;
+    }
+    25%, 75% {
+        width: 19ch;
+    }
+}
+
+/* Optional alternate typing animation */
+@keyframes typing-typing {
+    0% {
+        width: 0;
+    }
+    10%, 70% {
+        width: 23ch;
+    }
+}
+
+/* Delays animation for second typing element */
+.four h3:nth-child(2) {
+    animation-delay: 5s;
+    animation-fill-mode: forwards;
+    animation-play-state: paused;
+}
+
+/* Applies alternate animation with delay */
+.four h3:nth-child(2):nth-of-type(2) {
+    animation: typing-typing 30s steps(19, end) infinite, blink-caret 0.5s step-end infinite alternate;
+    animation-delay: 5s;
+}
+
+/* Centers and rounds the robot image */
+.robot {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.robot img {
+    max-width: 50%;
+    max-height: 100%;
+    width: auto;
+    height: auto;
+    border-radius: 50%;
+}
+
+/* Styles the fixed input box at the bottom */
+.main-bottom {
+    position: absolute;
+    bottom: 0;
+    width: 100%;
+    max-width: 900px;
+    padding: 0px 20px;
+    margin: auto;
+}
+
+/* Container for input and buttons */
+.search-box {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 20px;
+    background-color: #c2c2c2;
+    padding: 10px 20px;
+    border-radius: 50px;
+    margin-bottom: 50px;
+}
+
+/* Mic and send icons inside the input */
+.search-box img {
+    width: 24px;
+    cursor: pointer;
+}
+
+/* Text input field inside the chat box */
+.search-box input {
+    flex: 1;
+    background: transparent;
+    border: 0;
+    outline: 0;
+    padding: 8px;
+    font-size: 18px;
+}
+
+/* Groups mic and send icons */
+.search-box div {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+}
+
+/* Small text below chat box (optional info) */
+.main .bottom-info {
+    font-size: 13px;
+    margin: 15px auto;
+    text-align: center;
+    font-weight: 300;
+}
+
+/* Chat results area with scroll */
+.result {
+    padding: 0px 0%;
+    max-height: 85vh;
+    overflow-y: auto;
+    margin-top: 20px;
+}
+
+/* Scrollbar width */
+.result::-webkit-scrollbar {
+    width: 8px;
+}
+
+/* Scrollbar thumb default */
+.result::-webkit-scrollbar-thumb {
+    background-color: #888;
+    border-radius: 10px;
+}
+
+/* Scrollbar thumb on hover */
+.result::-webkit-scrollbar-thumb:hover {
+    background-color: #555;
+}
+
+/* Layout for user and AI icons with text */
+.result-title {
+    margin: 40px 0px;
+    display: flex;
+    align-items: center;
+    gap: 20px;
+}
+
+/* Icons for user and AI */
+.result img {
+    width: 40px;
+    border-radius: 50px;
+}
+
+/* Layout for AI response and user input */
+.result-data {
+    display: flex;
+    align-items: start;
+    gap: 20px;
+}
+
+/* Text for user prompt */
+.result-data p {
+    font-size: 17px;
+    font-weight: 300;
+    line-height: 1.8;
+}
+
+/* Style for AI response text */
+.ai-response {
+    white-space: pre-wrap;
+    line-height: 1.6;
+    font-size: 16px;
+    padding: 8px 0;
+}
+
+/* Bold text in AI response */
+.ai-response b {
+    font-weight: 600;
+}
+
+/* Italic text in AI response */
+.ai-response i {
+    font-style: italic;
+}
+
+/* Unordered lists inside AI response */
+.ai-response ul {
+    padding-left: 20px;
+}
+
+/* List item spacing */
+.ai-response li {
+    margin-bottom: 6px;
+}
